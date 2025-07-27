@@ -6,6 +6,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AHT10.Shared", "AHT10.Share
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AHT10", "AHT10\AHT10.vcxproj", "{27AFE934-E07E-44FC-9DF7-79A7FF3B1E47}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AHT10.Tests", "..\tests\AHT10.Tests\AHT10.Tests.vcxproj", "{D48508E8-8BFF-297E-1EE2-52B29C3760F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -26,6 +28,14 @@ Global
 		{27AFE934-E07E-44FC-9DF7-79A7FF3B1E47}.Release|ARM64.ActiveCfg = Release|ARM64
 		{27AFE934-E07E-44FC-9DF7-79A7FF3B1E47}.Release|ARM64.Build.0 = Release|ARM64
 		{27AFE934-E07E-44FC-9DF7-79A7FF3B1E47}.Release|ARM64.Deploy.0 = Release|ARM64
+		{D48508E8-8BFF-297E-1EE2-52B29C3760F5}.Debug|ARM.ActiveCfg = Debug|x64
+		{D48508E8-8BFF-297E-1EE2-52B29C3760F5}.Debug|ARM.Build.0 = Debug|x64
+		{D48508E8-8BFF-297E-1EE2-52B29C3760F5}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{D48508E8-8BFF-297E-1EE2-52B29C3760F5}.Debug|ARM64.Build.0 = Debug|ARM64
+		{D48508E8-8BFF-297E-1EE2-52B29C3760F5}.Release|ARM.ActiveCfg = Release|x64
+		{D48508E8-8BFF-297E-1EE2-52B29C3760F5}.Release|ARM.Build.0 = Release|x64
+		{D48508E8-8BFF-297E-1EE2-52B29C3760F5}.Release|ARM64.ActiveCfg = Release|ARM64
+		{D48508E8-8BFF-297E-1EE2-52B29C3760F5}.Release|ARM64.Build.0 = Release|ARM64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

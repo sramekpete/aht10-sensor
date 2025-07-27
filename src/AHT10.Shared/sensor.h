@@ -88,22 +88,27 @@ namespace Aht10 {
 		/// Stores a 16-bit unsigned integer representing an address.
 		/// </summary>
 		uint16_t m_address;
+
 		/// <summary>
 		/// A fixed-size array of three 8-bit unsigned integers.
 		/// </summary>
-		uint8_t m_buff[3];
+		uint8_t m_write_buffer[3];
+
 		/// <summary>
 		/// A shared pointer to the current sensor measurement.
 		/// </summary>
-		std::shared_ptr<Sensor::Measurement> m_current;
+		std::shared_ptr<Sensor::Measurement> m_current_measurement;
+
 		/// <summary>
 		/// An array of 6 unsigned 8-bit integers.
 		/// </summary>
-		uint8_t m_data[6];
+		uint8_t m_read_buffer[6];
+
 		/// <summary>
 		/// A string representing the device identifier or name.
 		/// </summary>
 		std::string m_device;
+
 		/// <summary>
 		/// An integer representing a file descriptor.
 		/// </summary>
@@ -125,6 +130,7 @@ namespace Aht10 {
 		/// True if the expected status is reached within the specified iterations, false otherwise.
 		/// </returns>
 		bool waitForStatus(Status expected, int maxIterations = 5, long waitInterval = 10000000L) const;
+
 		/// <summary>
 		/// Reads data from the sensor into the provided buffer.
 		/// </summary>
@@ -132,6 +138,7 @@ namespace Aht10 {
 		/// True if the read operation is successful, false otherwise.
 		/// </returns>
 		uint8_t getSystemData() const;
+
 		/// <summary>
 		///Sets the current operating mode.
 		/// </summary>
@@ -142,6 +149,7 @@ namespace Aht10 {
 		/// True if the mode was set successfully; false otherwise.
 		/// </returns>
 		bool setMode(Mode mode);
+
 	public:
 		/// <summary>
 		/// Constructs a Sensor object for the specified device.
@@ -164,6 +172,7 @@ namespace Aht10 {
 		/// A Humidity object representing the humidity in the requested unit.
 		/// </returns>
 		Humidity getHumidity(Humidity::Unit unit) const;
+
 		/// <summary>
 		/// Retrieves a Result object based on the specified temperature and humidity units.
 		/// </summary>
@@ -177,6 +186,7 @@ namespace Aht10 {
 		/// A Result object containing values in the specified temperature and humidity units.
 		/// </returns>
 		Result getResult(Temperature::Unit temperatureUnit, Humidity::Unit humidityUnit) const;
+
 		/// <summary>
 		/// Retrieves the temperature in the specified unit.
 		/// </summary>
@@ -187,6 +197,7 @@ namespace Aht10 {
 		/// The temperature value represented in the specified unit.
 		/// </returns>
 		Temperature getTemperature(Temperature::Unit unit) const;
+
 		/// <summary>
 		/// Retrieves the timestamp of last measurement.
 		/// </summary>
@@ -194,7 +205,7 @@ namespace Aht10 {
 		/// The timestamp of last measurement as a value of type time_t.
 		/// </returns>
 		time_t getTimestamp() const;
-		
+
 		/// <summary>
 		/// Initializes the system, optionally performing calibration.
 		/// </summary>
@@ -205,6 +216,7 @@ namespace Aht10 {
 		/// True if initialization succeeds; false otherwise.
 		/// </returns>
 		bool initialize(bool calibrate);
+
 		/// <summary>
 		/// Calibrates the sensor.
 		/// </summary>
@@ -212,6 +224,7 @@ namespace Aht10 {
 		/// True if calibration is successful; false otherwise.
 		/// </returns>
 		bool calibrate();
+
 		/// <summary>
 		/// Performs a measurement operation and returns the result as a boolean value.
 		/// </summary>
@@ -219,6 +232,7 @@ namespace Aht10 {
 		/// True if the measurement was successful or met the required condition; false otherwise.
 		/// </returns>
 		bool measure();
+
 		/// <summary>
 		/// Soft resets the sensor.
 		/// </summary>

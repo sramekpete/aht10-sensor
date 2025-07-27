@@ -50,9 +50,9 @@ bool Aht10::Sensor::waitForStatus(Status expected, int maxIterations, long waitI
 /// True if the mode was set successfully; false otherwise.
 /// </returns>
 bool Aht10::Sensor::setMode(Mode mode) {
-	m_buff[0] = mode;
+	m_write_buffer[0] = mode;
 
-	if (write(m_fd, m_buff, 1) != 1) {
+	if (write(m_fd, m_write_buffer, 1) != 1) {
 		return false;
 	}
 
@@ -84,7 +84,7 @@ Aht10::Sensor::Sensor(std::string device, bool useAlternativeAddress) {
 	m_fd = 0;
 	m_device = device;
 	m_address = useAlternativeAddress ? Address::ALTERNATIVE : Address::DEFAULT;
-	m_current = nullptr;
+	m_current_measurement = nullptr;
 };
 
 /// <summary>
@@ -133,9 +133,9 @@ bool Aht10::Sensor::calibrate() {
 		return false;
 	}
 
-	m_buff[0] = Command::Calibrate;
+	m_write_buffer[0] = Command::Calibrate;
 
-	if (write(m_fd, m_buff, 1) != 1 || !Aht10::Sensor::waitForStatus(Status::Calibrated)) {
+	if (write(m_fd, m_write_buffer, 1) != 1 || !Aht10::Sensor::waitForStatus(Status::Calibrated)) {
 		std::cerr << "Calibration failed..." << std::endl;
 		return false;
 	}
@@ -153,28 +153,28 @@ bool Aht10::Sensor::calibrate() {
 bool Aht10::Sensor::measure() {
 	std::cout << "Measurement starting..." << std::endl;
 
-	m_buff[0] = Command::Measure;
-	m_buff[1] = Command::Read;
-	m_buff[2] = Command::Empty;
+	m_write_buffer[0] = Command::Measure;
+	m_write_buffer[1] = Command::Read;
+	m_write_buffer[2] = Command::Empty;
 
-	if (write(m_fd, m_buff, 3) != 3 || !Aht10::Sensor::waitForStatus(Status::Ready)) {
+	if (write(m_fd, m_write_buffer, 3) != 3 || !Aht10::Sensor::waitForStatus(Status::Ready)) {
 		std::cerr << "Measurement failed..." << std::endl;
 		return false;
 	}
 
 	std::cout << "Read starting..." << std::endl;
 
-	if (read(m_fd, m_data, 6) != 6 || !(m_data[0] & Status::Ready)) {
+	if (read(m_fd, m_read_buffer, 6) != 6 || !(m_read_buffer[0] & Status::Ready)) {
 		std::cerr << "Read failed..." << std::endl;
 		return false;
 	}
 
-	double humidity = ((m_data[1] << 12) | (m_data[2] << 4) | (m_data[3] >> 4));
-	double temperature = (((m_data[3] & 0x0F) << 16) | (m_data[4] << 8) | m_data[5]);
+	double humidity = ((m_read_buffer[1] << 12) | (m_read_buffer[2] << 4) | (m_read_buffer[3] >> 4));
+	double temperature = (((m_read_buffer[3] & 0x0F) << 16) | (m_read_buffer[4] << 8) | m_read_buffer[5]);
 	time_t timestamp = time(NULL);
   
-    m_current.reset();
-    m_current = std::make_shared<Aht10::Sensor::Measurement>(Measurement::create(temperature, humidity, timestamp));
+    m_current_measurement.reset();
+	m_current_measurement = std::make_shared<Aht10::Sensor::Measurement>(Measurement::create(temperature, humidity, timestamp));
 
 	std::cout << "Read finished..." << std::endl;
 
@@ -196,17 +196,17 @@ Aht10::Temperature Aht10::Sensor::getTemperature(Temperature::Unit unit) const
 {
 	switch (unit) {
 		case Temperature::Unit::Celsius:
-			return Temperature::create(m_current->temperature * 200.0 / (1 << 20) - 50, unit);
+			return Temperature::create(m_current_measurement->temperature * 200.0 / (1 << 20) - 50, unit);
 		case Temperature::Unit::Farenhiet:
-			return Temperature::create((m_current->temperature * 200.0 / (1 << 20) - 50) * 1.8, unit);
+			return Temperature::create((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) * 1.8, unit);
 		case Temperature::Unit::Kelvin:
-			return Temperature::create((m_current->temperature * 200.0 / (1 << 20) - 50) + 273.15, unit);
+			return Temperature::create((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) + 273.15, unit);
 		case Temperature::Unit::Rankine:
-			return Temperature::create(((m_current->temperature * 200.0 / (1 << 20) - 50) + 273.15) * 1.8, unit);
+			return Temperature::create(((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) + 273.15) * 1.8, unit);
 		case Temperature::Unit::Reaumur:
-			return Temperature::create((m_current->temperature * 200.0 / (1 << 20) - 50) * 0.8, unit);
+			return Temperature::create((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) * 0.8, unit);
 		default:
-			return Temperature::create(m_current->temperature, Temperature::Unit::Raw);
+			return Temperature::create(m_current_measurement->temperature, Temperature::Unit::Raw);
 	};
 }
 
@@ -218,7 +218,7 @@ Aht10::Temperature Aht10::Sensor::getTemperature(Temperature::Unit unit) const
 /// </returns>
 time_t Aht10::Sensor::getTimestamp() const
 {
-	return m_current->timestamp;
+	return m_current_measurement->timestamp;
 }
 
 /// <summary>
@@ -234,11 +234,11 @@ Aht10::Humidity Aht10::Sensor::getHumidity(Humidity::Unit unit) const
 {
 	switch (unit) {
 	case Humidity::Unit::Percent:
-		return Humidity::create(m_current->humidity * 100.0 / (1 << 20), unit);
+		return Humidity::create(m_current_measurement->humidity * 100.0 / (1 << 20), unit);
 	case Humidity::Unit::Ratio:
-		return Humidity::create(m_current->humidity / (1 << 20), unit);
+		return Humidity::create(m_current_measurement->humidity / (1 << 20), unit);
 	default:
-		return Humidity::create(m_current->humidity, Humidity::Unit::Raw);
+		return Humidity::create(m_current_measurement->humidity, Humidity::Unit::Raw);
 	};
 }
 
@@ -281,9 +281,9 @@ uint8_t Aht10::Sensor::getSystemData() const {
 void Aht10::Sensor::reset() {
 	std::cout << "Reset starting..." << std::endl;
 
-	m_buff[0] = Command::Reset;
+	m_write_buffer[0] = Command::Reset;
 
-	if (write(m_fd, m_buff, 1) != 1 || !Aht10::Sensor::waitForStatus(Status::Ready)) {
+	if (write(m_fd, m_write_buffer, 1) != 1 || !Aht10::Sensor::waitForStatus(Status::Ready)) {
 		std::cerr << "Reset failed..." << std::endl;
 	}
 

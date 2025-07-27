@@ -97,7 +97,7 @@ Aht10::Sensor::Sensor(std::string device, bool useAlternativeAddress) {
 /// Returns true if the sensor is successfully initialized (and calibrated if requested); otherwise, throws an exception on failure.
 /// </returns>
 bool Aht10::Sensor::initialize(bool calibrate) {
-	printf("Device opening...\r\n");
+	std::cout << "Device opening..." << std::endl;
 
 	m_fd = open(m_device.c_str(), O_RDWR);
 
@@ -172,8 +172,8 @@ bool Aht10::Sensor::measure() {
 	double humidity = ((m_read_buffer[1] << 12) | (m_read_buffer[2] << 4) | (m_read_buffer[3] >> 4));
 	double temperature = (((m_read_buffer[3] & 0x0F) << 16) | (m_read_buffer[4] << 8) | m_read_buffer[5]);
 	time_t timestamp = time(NULL);
-  
-    m_current_measurement.reset();
+
+	m_current_measurement.reset();
 	m_current_measurement = std::make_shared<Aht10::Sensor::Measurement>(Measurement::create(temperature, humidity, timestamp));
 
 	std::cout << "Read finished..." << std::endl;
@@ -195,18 +195,18 @@ bool Aht10::Sensor::measure() {
 Aht10::Temperature Aht10::Sensor::getTemperature(Temperature::Unit unit) const
 {
 	switch (unit) {
-		case Temperature::Unit::Celsius:
-			return Temperature::create(m_current_measurement->temperature * 200.0 / (1 << 20) - 50, unit);
-		case Temperature::Unit::Farenhiet:
-			return Temperature::create((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) * 1.8, unit);
-		case Temperature::Unit::Kelvin:
-			return Temperature::create((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) + 273.15, unit);
-		case Temperature::Unit::Rankine:
-			return Temperature::create(((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) + 273.15) * 1.8, unit);
-		case Temperature::Unit::Reaumur:
-			return Temperature::create((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) * 0.8, unit);
-		default:
-			return Temperature::create(m_current_measurement->temperature, Temperature::Unit::Raw);
+	case Temperature::Unit::Celsius:
+		return Temperature::create(m_current_measurement->temperature * 200.0 / (1 << 20) - 50, unit);
+	case Temperature::Unit::Farenhiet:
+		return Temperature::create((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) * 1.8, unit);
+	case Temperature::Unit::Kelvin:
+		return Temperature::create((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) + 273.15, unit);
+	case Temperature::Unit::Rankine:
+		return Temperature::create(((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) + 273.15) * 1.8, unit);
+	case Temperature::Unit::Reaumur:
+		return Temperature::create((m_current_measurement->temperature * 200.0 / (1 << 20) - 50) * 0.8, unit);
+	default:
+		return Temperature::create(m_current_measurement->temperature, Temperature::Unit::Raw);
 	};
 }
 
@@ -265,14 +265,14 @@ Aht10::Result Aht10::Sensor::getResult(Temperature::Unit temperatureUnit, Humidi
 /// <returns>
 /// The system status byte read from the sensor. Returns 0xFF if the read operation fails.
 /// </returns>
-uint8_t Aht10::Sensor::getSystemData() const {
+Aht10::Status Aht10::Sensor::getStatus() const {
 	uint8_t status;
 
 	if (read(m_fd, &status, 1) != 1) {
-		return 0xFF;
+		return Aht10::Status::Error;
 	}
 
-	return status;
+	return static_cast<Aht10::Status>(status);
 }
 
 /// <summary>

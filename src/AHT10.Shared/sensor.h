@@ -137,7 +137,7 @@ namespace Aht10 {
 		/// <returns>
 		/// True if the read operation is successful, false otherwise.
 		/// </returns>
-		uint8_t getSystemData() const;
+		Aht10::Status getStatus() const;
 
 		/// <summary>
 		///Sets the current operating mode.

@@ -27,5 +27,10 @@ namespace Aht10 {
         /// Sensor is busy processing a command or measurement.
         /// </summary>
         Busy = 0x80,
+
+		/// <summary>
+		/// Sensor is in an error state or has encountered a failure.
+		/// </summary>
+		Error = 0xFF
     };
 }

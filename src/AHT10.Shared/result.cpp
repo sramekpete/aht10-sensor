@@ -13,8 +13,7 @@
 /// The timestamp of the measurement, in seconds since the epoch (January 1, 1970).
 /// </param>
 Aht10::Result::Result(Temperature temperature, Humidity humidity, time_t timestamp)
-	: temperature(temperature), humidity(humidity), timestamp(timestamp) {
-}
+	: temperature(temperature), humidity(humidity), timestamp(timestamp) { }
 
 /// <summary>
 /// Creates a new Aht10::Result object with the specified temperature, humidity, and timestamp.

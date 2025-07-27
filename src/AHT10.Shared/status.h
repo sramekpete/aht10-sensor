@@ -9,9 +9,9 @@ namespace Aht10 {
     enum Status : uint8_t
     {
         /// <summary>
-        /// No status or default state.
+		/// Sensor status is unknown or not initialized.
         /// </summary>
-        None = 0x00,
+        Unknown = 0x00,
 
         /// <summary>
         /// Sensor is calibrated and ready for operation.
